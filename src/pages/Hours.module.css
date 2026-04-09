@@ -1,0 +1,100 @@
+/* ==========================================================================
+   HOURS LEDGER VIVID UI (Bright Premium)
+   ========================================================================== */
+
+/* 1. Base Viewport */
+.osViewport {
+  min-height: 100vh; width: 100vw; background: transparent; color: var(--text-heading);
+  display: flex; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; position: relative;
+}
+
+/* Hide old dark-mode canvas elements */
+.ambientCanvas, .colorOrb1, .colorOrb2, .glassOverlay { display: none; }
+
+/* 2. Glassmorphic Sidebar */
+.osSidebar {
+  position: relative; z-index: 10; width: 280px; 
+  background: var(--glass-bg); backdrop-filter: var(--glass-blur);
+  border-right: var(--glass-border); box-shadow: var(--glass-shadow);
+  display: flex; flex-direction: column; padding: 2rem 1.5rem;
+}
+
+.brandGroup { display: flex; align-items: center; gap: 1rem; margin-bottom: 3rem; padding-left: 0.5rem; }
+.logoBadge { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--color-primary-glow); }
+.brandTitle { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.05em; color: var(--text-heading); }
+
+/* Navigation Menu */
+.sidebarMenu { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+.menuItemWrap { width: 100%; }
+.menuBtnActive, .menuBtnSecondary, .menuBtnDanger {
+  position: relative; width: 100%; display: flex; align-items: center; gap: 1rem; padding: 1rem; background: transparent; border: none; border-radius: 16px; cursor: pointer; outline: none; color: var(--text-muted); font-size: 1rem; font-weight: 600; transition: color 0.3s ease; z-index: 2;
+}
+
+.menuBtnSecondary { border: 1px solid rgba(15,23,42,0.1); }
+.menuBtnSecondary:hover { background: rgba(15,23,42,0.05); color: var(--text-heading); }
+
+.menuBtnActive { color: #FFF; }
+.activeMenuBg {
+  position: absolute; inset: 0; background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base));
+  border-radius: 16px; z-index: -1; box-shadow: 0 8px 25px var(--color-primary-glow);
+}
+
+.menuBtnDanger { background: rgba(239, 68, 68, 0.1); color: var(--color-error); border: 1px solid rgba(239, 68, 68, 0.2);}
+.menuBtnDanger:hover { background: var(--color-error); color: #fff; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
+
+/* 3. Main Window Container */
+.osMainWindow { flex: 1; position: relative; z-index: 10; padding: 2rem; overflow-y: auto; perspective: 1200px; }
+
+/* Sliding Window Panes */
+.windowPane {
+  background: var(--glass-bg); backdrop-filter: var(--glass-blur);
+  border: var(--glass-border); border-radius: 36px;
+  min-height: calc(100vh - 4rem); padding: 3.5rem;
+  box-shadow: var(--glass-shadow);
+  display: flex; flex-direction: column; gap: 2.5rem;
+}
+
+.windowHeader h1 { font-size: 3.5rem; font-weight: 800; margin: 0 0 0.5rem 0; letter-spacing: -0.04em; color: var(--text-heading); }
+.windowHeader p { font-size: 1.2rem; color: var(--text-body); margin: 0; }
+
+/* Dashboard Layout */
+.hoursGrid { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: flex-start;}
+@media(max-width: 1024px) {
+    .hoursGrid { grid-template-columns: 1fr; }
+}
+
+.inputCard, .recordsCard {
+  background: rgba(255,255,255,0.4); border: 1px solid rgba(15,23,42,0.1); padding: 2.5rem; border-radius: 24px; box-shadow: var(--shadow-sm);
+}
+
+.inputCard h3 { font-size: 1.5rem; margin: 0 0 1.5rem 0; color: var(--color-accent-base); }
+
+.formGroup { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+.formGroup label { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
+
+.neonSelect, .neonInput {
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(15,23,42,0.1); color: var(--text-heading);
+  padding: 1rem 1.5rem; border-radius: 16px; font-size: 1.1rem; transition: all 0.3s;
+}
+.neonSelect:focus, .neonInput:focus { outline: none; border-color: var(--color-primary-base); box-shadow: 0 0 20px var(--color-primary-glow), inset 0 0 10px rgba(255, 51, 102, 0.1); }
+.neonSelect option { background: #fff; color: var(--text-heading); }
+
+.deployBtn {
+  background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base)); color: white; border: none; width: 100%;
+  padding: 1rem 2rem; border-radius: 16px; font-weight: 800; font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px var(--color-primary-glow);
+}
+.deployBtn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(255, 51, 102, 0.4); }
+
+.recordHeaderLayer { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;}
+.recordHeaderLayer h3 { font-size: 1.5rem; margin: 0; color: var(--text-heading);}
+.statPill { background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.5rem 1.5rem; border-radius: 100px; font-weight: 800; font-size: 0.9rem; letter-spacing: 1px; }
+
+/* Tables */
+.tableWrapper { border-radius: 16px; overflow: hidden; border: 1px solid rgba(15,23,42,0.1); }
+.neonTable { width: 100%; border-collapse: collapse; }
+.neonTable th { padding: 1.5rem; text-align: left; background: rgba(255,255,255,0.5); color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; border-bottom: 1px solid rgba(15,23,42,0.1);}
+.neonTable td { padding: 1.5rem; border-bottom: 1px solid rgba(15,23,42,0.05); font-size: 1.1rem; color: var(--text-body);}
+.neonTable tr:hover td { background: rgba(255,255,255,0.3); }
+
+.emptyMsg { text-align: center; color: var(--text-muted); padding: 3rem; font-style: italic;}

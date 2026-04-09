@@ -1,0 +1,97 @@
+/* ==========================================================================
+   JOBS VIVID MARKETPLACE UI (Bright Premium)
+   ========================================================================== */
+
+/* 1. Base Viewport */
+.osViewport {
+  min-height: 100vh; width: 100vw; background: transparent; color: var(--text-heading);
+  display: flex; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; position: relative;
+}
+
+/* Hide old dark-mode canvas elements */
+.ambientCanvas, .colorOrb1, .colorOrb2, .glassOverlay { display: none; }
+
+/* 2. Glassmorphic Sidebar */
+.osSidebar {
+  position: relative; z-index: 10; width: 280px; 
+  background: var(--glass-bg); backdrop-filter: var(--glass-blur);
+  border-right: var(--glass-border); box-shadow: var(--glass-shadow);
+  display: flex; flex-direction: column; padding: 2rem 1.5rem;
+}
+
+.brandGroup { display: flex; align-items: center; gap: 1rem; margin-bottom: 3rem; padding-left: 0.5rem; }
+.logoBadge { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--color-primary-glow); }
+.brandTitle { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.05em; color: var(--text-heading); }
+
+/* Navigation Menu */
+.sidebarMenu { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+.menuItemWrap { width: 100%; }
+.menuBtn, .menuBtnActive, .menuBtnSecondary, .menuBtnDanger {
+  position: relative; width: 100%; display: flex; align-items: center; gap: 1rem; padding: 1rem; background: transparent; border: none; border-radius: 16px; cursor: pointer; outline: none; color: var(--text-muted); font-size: 1rem; font-weight: 600; transition: color 0.3s ease; z-index: 2;
+}
+
+.menuBtnSecondary { border: 1px solid rgba(15,23,42,0.1); }
+.menuBtnSecondary:hover { background: rgba(15,23,42,0.05); color: var(--text-heading); }
+
+.menuBtnActive { color: #fff; }
+.activeMenuBg {
+  position: absolute; inset: 0; background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base));
+  border-radius: 16px; z-index: -1; box-shadow: 0 8px 25px var(--color-primary-glow);
+}
+
+.menuBtnDanger { background: rgba(239, 68, 68, 0.1); color: var(--color-error); border: 1px solid rgba(239, 68, 68, 0.2);}
+.menuBtnDanger:hover { background: var(--color-error); color: #fff; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
+
+/* 3. Main Window Container */
+.osMainWindow { flex: 1; position: relative; z-index: 10; padding: 2rem; overflow-y: auto; perspective: 1000px; }
+
+/* Sliding Window Panes */
+.windowPane {
+  background: var(--glass-bg); backdrop-filter: var(--glass-blur);
+  border: var(--glass-border); border-radius: 32px;
+  min-height: calc(100vh - 4rem); padding: 3rem;
+  box-shadow: var(--glass-shadow);
+  display: flex; flex-direction: column; gap: 2rem;
+}
+
+.windowHeader h1 { font-size: 3rem; font-weight: 800; margin: 0 0 0.5rem 0; letter-spacing: -0.03em; color: var(--text-heading); }
+.windowHeader p { font-size: 1.1rem; color: var(--text-body); margin: 0; }
+
+/* Discovery Cards */
+.listContainer { display: flex; flex-direction: column; gap: 1rem; }
+.jobSlideCard {
+  position: relative; background: var(--bg-surface-glass); border: 1px solid rgba(15,23,42,0.1);
+  border-radius: 20px; overflow: hidden; transition: all 0.3s;
+}
+
+.cardGlow { position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent); transform: skewX(-20deg); transition: 0.5s; }
+.jobSlideCard:hover .cardGlow { left: 200%; }
+
+.jobContent { padding: 1.5rem 2rem; display: flex; flex-direction: column; gap: 1.5rem;}
+.jobHeaderRow { display: flex; gap: 1.5rem; align-items: flex-start;}
+.jobIconBlock { width: 50px; height: 50px; background: var(--color-primary-glow); color: var(--color-primary-base); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;}
+.jobHeaderRow h3 { font-size: 1.25rem; font-weight: 700; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 1rem; color: var(--text-heading);}
+.jobHeaderRow p { margin: 0; font-size: 0.95rem; color: var(--text-body); line-height: 1.5;}
+
+.badge { display: inline-flex; align-items: center; gap: 6px; font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 1px; color: var(--color-primary-base); background: var(--color-primary-glow); padding: 4px 10px; border-radius: 100px; border: 1px solid rgba(255, 51, 102, 0.2); }
+
+.jobActionRow { display: flex; align-items: center; gap: 1rem; justify-content: flex-end; border-top: 1px solid rgba(15,23,42,0.1); padding-top: 1.5rem;}
+
+.pillSuccess { background: rgba(16, 185, 129, 0.15); color: #10B981; padding: 0.75rem 1.25rem; border-radius: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+.uploadWidgetGroup { display: flex; align-items: center; gap: 0.5rem; }
+.uploadTriggerLabel {
+  display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem;
+  background: rgba(15,23,42,0.05); border: 1px dashed rgba(15,23,42,0.2);
+  border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  color: var(--text-muted);
+}
+.uploadTriggerLabel:hover { background: rgba(15,23,42,0.1); border-color: var(--color-accent-base); color: var(--color-accent-base);}
+.uploadTriggerLabel input { display: none; }
+
+.deploySmallBtn {
+  background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base)); color: #fff;
+  padding: 0.75rem 2rem; border: none; border-radius: 12px; font-weight: 800;
+  cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 15px var(--color-primary-glow);
+}
+.deploySmallBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 51, 102, 0.4); }

@@ -1,0 +1,170 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap');
+
+/* ==========================================================================
+   GLOBAL DESIGN TOKENS (Premium Bright Glassmorphism Theme)
+   ========================================================================== */
+:root {
+  /* 1. Fluid Typography */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.8125rem);
+  --text-sm: clamp(0.875rem, 0.825rem + 0.25vw, 0.9375rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
+  --text-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
+  --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --text-2xl: clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem);
+  --text-3xl: clamp(1.875rem, 1.625rem + 1.25vw, 2.25rem);
+  --text-4xl: clamp(2.25rem, 1.85rem + 2vw, 3rem);
+
+  /* 2. Spacing System */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-24: 6rem;     /* 96px */
+
+  /* 3. Core Color Palette */
+  --color-primary-base: #ff3366;  /* Vibrant Pink */
+  --color-primary-glow: rgba(255, 51, 102, 0.3);
+  
+  --color-accent-base: #ff9933;   /* Bright Orange */
+  
+  /* Text Colors (High Contrast for Light Theme) */
+  --text-heading: #0f172a;
+  --text-body: #334155;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+
+  /* Surfaces & Backgrounds */
+  --bg-app: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-glass: rgba(255, 255, 255, 0.7);
+
+  /* 4. Glassmorphism Utilities */
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-blur: blur(20px);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.6);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+
+  --border-radius-sm: 8px;
+  --border-radius-md: 16px;
+  --border-radius-lg: 24px;
+  
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+  /* Transitions */
+  --ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --transition-fast: 200ms ease;
+  --transition-base: 300ms ease;
+  --transition-bounce: 400ms var(--ease-elastic);
+}
+
+/* ==========================================================================
+   RESET & BASE STYLES
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text-body);
+  background-color: var(--bg-app);
+  
+  /* Bright VIBRANT Mesh Background */
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(353,100%,73%,0.15) 0px, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(225,100%,74%,0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339,100%,55%,0.15) 0px, transparent 50%);
+  background-attachment: fixed;
+  background-size: cover;
+  
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+  color: var(--text-heading);
+  margin: 0 0 var(--space-4);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+h1 { font-size: var(--text-4xl); font-weight: 800; }
+h2 { font-size: var(--text-3xl); font-weight: 700; }
+h3 { font-size: var(--text-2xl); font-weight: 700; }
+p { margin: 0 0 var(--space-4); font-size: var(--text-base); }
+a { color: var(--color-primary-base); text-decoration: none; transition: var(--transition-fast); }
+a:hover { color: var(--color-accent-base); }
+
+/* Unified Glass Panel Class */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--glass-shadow);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ==========================================================================
+   DARK THEME OVERRIDES
+   ========================================================================== */
+[data-theme='dark'] {
+  --text-heading: #f8fafc;
+  --text-body: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-inverse: #0f172a;
+
+  --bg-app: #0f172a;
+  --bg-surface: #1e293b;
+  --bg-surface-glass: rgba(30, 41, 59, 0.7);
+
+  --glass-bg: rgba(30, 41, 59, 0.4);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] body {
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(353,100%,73%,0.07) 0px, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(225,100%,74%,0.07) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339,100%,55%,0.07) 0px, transparent 50%);
+}
+
+[data-theme='dark'] .ant-typography,
+[data-theme='dark'] .ant-menu-item,
+[data-theme='dark'] .ant-statistic-title,
+[data-theme='dark'] .ant-table-cell {
+  color: var(--text-body) !important;
+}
+
+[data-theme='dark'] .ant-typography > h1,
+[data-theme='dark'] .ant-typography > h2,
+[data-theme='dark'] .ant-typography > h3,
+[data-theme='dark'] .ant-typography > h4,
+[data-theme='dark'] .ant-typography > h5,
+[data-theme='dark'] .ant-card-head-title,
+[data-theme='dark'] .ant-statistic-content-value {
+  color: var(--text-heading) !important;
+}
+
+[data-theme='dark'] .ant-table,
+[data-theme='dark'] .ant-table-thead > tr > th {
+  background: var(--bg-surface) !important;
+  color: var(--text-heading) !important;
+  border-bottom-color: var(--glass-border) !important;
+}
