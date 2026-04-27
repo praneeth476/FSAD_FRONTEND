@@ -49,7 +49,7 @@ let msalInstance;
 if (!isPopupCallback) {
   msalInstance = new PublicClientApplication(msalConfig);
 }
-const GOOGLE_CLIENT_ID = "698385902892-2ep0d484pu32cdb74h4ckatgbhi3fcn8.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "69371023168-a2g75p0v164dsvghhgl0qgcj0t68lsgq.apps.googleusercontent.com";
 
 export default function App() {
   const [msalReady, setMsalReady] = useState(false);
