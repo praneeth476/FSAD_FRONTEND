@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const BASE = "/api";
-const api = axios.create({ baseURL: BASE });
+export const BASE_URL = "https://fsad-backend-updated.onrender.com/api";
+const api = axios.create({ baseURL: BASE_URL });
 
 // ================= INTERCEPTORS ================= //
 

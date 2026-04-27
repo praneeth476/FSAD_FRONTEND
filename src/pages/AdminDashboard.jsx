@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getApplications, approveApp, addJob, getJobs, deleteJob, getAllHours, approveHours, payHours } from "../services/api";
+import { getApplications, approveApp, addJob, getJobs, deleteJob, getAllHours, approveHours, payHours, BASE_URL } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -443,7 +443,7 @@ export default function AdminDashboard() {
                                 )}
 
                                 <div className={styles.appTools}>
-                                  <Button type="link" icon={<FilePdfOutlined />} href={`/api/applications/resume/${a.id}`} target="_blank" style={{ padding: 0, color: '#1d4ed8', fontWeight: 500 }}>
+                                  <Button type="link" icon={<FilePdfOutlined />} href={`${BASE_URL}/applications/resume/${a.id}`} target="_blank" style={{ padding: 0, color: '#1d4ed8', fontWeight: 500 }}>
                                     Review Resume
                                   </Button>
                                   {a.status === "PENDING" && (
