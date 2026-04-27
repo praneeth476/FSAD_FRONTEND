@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { getJobs, applyJob, getStudentApps } from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { message } from "antd";
 import styles from "./Jobs.module.css";
 
 export default function Jobs() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const { user, logout } = useAuth();
 
   const [jobs, setJobs] = useState([]);
   const [apps, setApps] = useState([]);
@@ -30,17 +32,17 @@ export default function Jobs() {
 
   const apply = async (id) => {
     if (!files[id]) {
-      alert("Please upload your resume first.");
+      message.warning("Please upload your resume first.");
       return;
     }
 
     setLoading(true);
     try {
       await applyJob(user.id, id, files[id]);
-      alert("Application sent successfully!");
+      message.success("Application sent successfully!");
       loadData(); // Refresh to show applied status
     } catch (err) {
-      alert("Application failed. You might have already applied.");
+      message.error("Application failed. You might have already applied.");
     } finally {
       setLoading(false);
     }
@@ -61,7 +63,7 @@ export default function Jobs() {
           </nav>
           <div className={styles.sidebarBottom}>
              <button className={styles.logoutBtn} onClick={() => {
-               localStorage.removeItem("user");
+               logout();
                navigate("/login");
              }}>Logout</button>
           </div>

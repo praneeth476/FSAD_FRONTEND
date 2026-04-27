@@ -3,6 +3,35 @@ import axios from 'axios';
 const BASE = "/api";
 const api = axios.create({ baseURL: BASE });
 
+// ================= INTERCEPTORS ================= //
+
+// Inject active JWT token into every outgoing request automatically
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
+
+// React transparently to 401 Unauthorized errors globally
+api.interceptors.response.use((response) => {
+  return response;
+}, (error) => {
+  if (error.response && error.response.status === 401) {
+    // If receiving unauthorized errors, the token is likely dead, trigger a logout
+    console.error("401 Unauthorized - Token expired or invalid.");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+    window.dispatchEvent(new Event("auth-expired")); // Let App.jsx or dashboards listen if needed
+  }
+  return Promise.reject(error);
+});
+
 /* ================= REGISTER ================= */
 
 export const registerStudent = async (data) => {

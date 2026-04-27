@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon, Palette } from 'lucide-react';
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
@@ -10,7 +10,17 @@ export default function ThemeToggle() {
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+    setTheme(prev => {
+      if (prev === 'light') return 'dark';
+      if (prev === 'dark') return 'glass';
+      return 'light';
+    });
+  };
+
+  const getThemeIcon = () => {
+    if (theme === 'light') return <Moon size={24} color="currentColor" />;
+    if (theme === 'dark') return <Palette size={24} color="currentColor" />;
+    return <Sun size={24} color="currentColor" />;
   };
 
   return (
@@ -25,15 +35,13 @@ export default function ThemeToggle() {
         height: '56px',
         borderRadius: '50%',
         backgroundColor: 'var(--bg-surface)',
-        border: 'var(--glass-border)',
+        border: '1px solid var(--border-color)',
         boxShadow: 'var(--shadow-lg)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         cursor: 'pointer',
         color: 'var(--text-heading)',
-        backdropFilter: 'var(--glass-blur)',
-        WebkitBackdropFilter: 'var(--glass-blur)',
         transition: 'var(--transition-base)',
       }}
       onMouseOver={(e) => {
@@ -43,9 +51,9 @@ export default function ThemeToggle() {
         e.currentTarget.style.transform = 'scale(1)';
       }}
       aria-label="Toggle Theme"
-      title="Toggle Dark/Light Mode"
+      title={`Current theme: ${theme}. Click to change.`}
     >
-      {theme === 'light' ? <Moon size={24} color="currentColor" /> : <Sun size={24} color="currentColor" />}
+      {getThemeIcon()}
     </button>
   );
 }

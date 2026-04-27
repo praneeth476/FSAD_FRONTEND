@@ -1,60 +1,76 @@
 /* ==========================================================================
-   HOURS LEDGER VIVID UI (Bright Premium)
+   HOURS MODULE (SaaS Design System)
    ========================================================================== */
 
 /* 1. Base Viewport */
 .osViewport {
-  min-height: 100vh; width: 100vw; background: transparent; color: var(--text-heading);
-  display: flex; overflow: hidden; font-family: 'Inter', system-ui, sans-serif; position: relative;
+  min-height: 100vh; width: 100vw; background: var(--bg-app); color: var(--text-heading);
+  display: flex; overflow: hidden; font-family: var(--font-sans); position: relative;
 }
+
+[data-theme='glass'] .osViewport { background: transparent; }
 
 /* Hide old dark-mode canvas elements */
 .ambientCanvas, .colorOrb1, .colorOrb2, .glassOverlay { display: none; }
 
-/* 2. Glassmorphic Sidebar */
+/* 2. Sidebar */
 .osSidebar {
   position: relative; z-index: 10; width: 280px; 
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-color);
+  display: flex; flex-direction: column; padding: 2rem 1.5rem;
+  transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+
+[data-theme='glass'] .osSidebar {
   background: var(--glass-bg); backdrop-filter: var(--glass-blur);
   border-right: var(--glass-border); box-shadow: var(--glass-shadow);
-  display: flex; flex-direction: column; padding: 2rem 1.5rem;
 }
 
 .brandGroup { display: flex; align-items: center; gap: 1rem; margin-bottom: 3rem; padding-left: 0.5rem; }
-.logoBadge { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--color-primary-glow); }
+.logoBadge { width: 44px; height: 44px; border-radius: var(--border-radius-md); background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base)); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); color: #fff; }
 .brandTitle { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.05em; color: var(--text-heading); }
 
 /* Navigation Menu */
 .sidebarMenu { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
 .menuItemWrap { width: 100%; }
 .menuBtnActive, .menuBtnSecondary, .menuBtnDanger {
-  position: relative; width: 100%; display: flex; align-items: center; gap: 1rem; padding: 1rem; background: transparent; border: none; border-radius: 16px; cursor: pointer; outline: none; color: var(--text-muted); font-size: 1rem; font-weight: 600; transition: color 0.3s ease; z-index: 2;
+  position: relative; width: 100%; display: flex; align-items: center; gap: 1rem; padding: 1rem; background: transparent; border: none; border-radius: var(--border-radius-sm); cursor: pointer; outline: none; color: var(--text-muted); font-size: 1rem; font-weight: 600; transition: color 0.3s ease, background-color 0.3s ease; z-index: 2;
 }
 
-.menuBtnSecondary { border: 1px solid rgba(15,23,42,0.1); }
-.menuBtnSecondary:hover { background: rgba(15,23,42,0.05); color: var(--text-heading); }
+.menuBtnSecondary { border: 1px solid var(--border-color); }
+.menuBtnSecondary:hover { background: var(--bg-subtle); color: var(--text-heading); }
 
-.menuBtnActive { color: #FFF; }
-.activeMenuBg {
+.menuBtnActive { color: var(--color-primary-base); background: var(--color-primary-glow); }
+[data-theme='glass'] .menuBtnActive { color: #FFF; background: transparent; }
+
+[data-theme='glass'] .activeMenuBg {
   position: absolute; inset: 0; background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base));
-  border-radius: 16px; z-index: -1; box-shadow: 0 8px 25px var(--color-primary-glow);
+  border-radius: var(--border-radius-sm); z-index: -1; box-shadow: 0 8px 25px var(--color-primary-glow);
 }
 
-.menuBtnDanger { background: rgba(239, 68, 68, 0.1); color: var(--color-error); border: 1px solid rgba(239, 68, 68, 0.2);}
-.menuBtnDanger:hover { background: var(--color-error); color: #fff; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
+.menuBtnDanger { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2);}
+.menuBtnDanger:hover { background: #ef4444; color: #fff; }
 
 /* 3. Main Window Container */
-.osMainWindow { flex: 1; position: relative; z-index: 10; padding: 2rem; overflow-y: auto; perspective: 1200px; }
+.osMainWindow { flex: 1; position: relative; z-index: 10; padding: 2rem; overflow-y: auto; }
 
 /* Sliding Window Panes */
 .windowPane {
-  background: var(--glass-bg); backdrop-filter: var(--glass-blur);
-  border: var(--glass-border); border-radius: 36px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color); border-radius: var(--border-radius-lg);
   min-height: calc(100vh - 4rem); padding: 3.5rem;
-  box-shadow: var(--glass-shadow);
+  box-shadow: var(--shadow-sm);
   display: flex; flex-direction: column; gap: 2.5rem;
+  transition: background-color var(--transition-base), border-color var(--transition-base);
 }
 
-.windowHeader h1 { font-size: 3.5rem; font-weight: 800; margin: 0 0 0.5rem 0; letter-spacing: -0.04em; color: var(--text-heading); }
+[data-theme='glass'] .windowPane {
+  background: var(--glass-bg); backdrop-filter: var(--glass-blur);
+  border: var(--glass-border); box-shadow: var(--glass-shadow);
+}
+
+.windowHeader h1 { font-size: 2.5rem; font-weight: 800; margin: 0 0 0.5rem 0; letter-spacing: -0.04em; color: var(--text-heading); }
 .windowHeader p { font-size: 1.2rem; color: var(--text-body); margin: 0; }
 
 /* Dashboard Layout */
@@ -64,37 +80,46 @@
 }
 
 .inputCard, .recordsCard {
-  background: rgba(255,255,255,0.4); border: 1px solid rgba(15,23,42,0.1); padding: 2.5rem; border-radius: 24px; box-shadow: var(--shadow-sm);
+  background: var(--bg-surface); border: 1px solid var(--border-color); padding: 2.5rem; border-radius: var(--border-radius-md); box-shadow: var(--shadow-sm);
 }
 
-.inputCard h3 { font-size: 1.5rem; margin: 0 0 1.5rem 0; color: var(--color-accent-base); }
+[data-theme='glass'] .inputCard, [data-theme='glass'] .recordsCard {
+  background: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.2);
+}
+
+.inputCard h3 { font-size: 1.5rem; margin: 0 0 1.5rem 0; color: var(--color-primary-base); }
 
 .formGroup { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
 .formGroup label { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
 
 .neonSelect, .neonInput {
-  background: rgba(255,255,255,0.6); border: 1px solid rgba(15,23,42,0.1); color: var(--text-heading);
-  padding: 1rem 1.5rem; border-radius: 16px; font-size: 1.1rem; transition: all 0.3s;
+  background: var(--bg-subtle); border: 1px solid var(--border-color); color: var(--text-heading);
+  padding: 1rem 1.5rem; border-radius: var(--border-radius-sm); font-size: 1rem; transition: all 0.3s;
 }
-.neonSelect:focus, .neonInput:focus { outline: none; border-color: var(--color-primary-base); box-shadow: 0 0 20px var(--color-primary-glow), inset 0 0 10px rgba(255, 51, 102, 0.1); }
-.neonSelect option { background: #fff; color: var(--text-heading); }
+[data-theme='glass'] .neonSelect, [data-theme='glass'] .neonInput { background: rgba(255,255,255,0.6); }
+
+.neonSelect:focus, .neonInput:focus { outline: none; border-color: var(--color-primary-base); box-shadow: 0 0 0 3px var(--color-primary-glow); }
+.neonSelect option { background: var(--bg-surface); color: var(--text-heading); }
 
 .deployBtn {
-  background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base)); color: white; border: none; width: 100%;
-  padding: 1rem 2rem; border-radius: 16px; font-weight: 800; font-size: 1.1rem;
-  display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px var(--color-primary-glow);
+  background: var(--color-primary-base); color: white; border: none; width: 100%;
+  padding: 1rem 2rem; border-radius: var(--border-radius-sm); font-weight: 600; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; transition: 0.3s;
 }
-.deployBtn:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(255, 51, 102, 0.4); }
+.deployBtn:hover { background: var(--color-primary-hover); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+[data-theme='glass'] .deployBtn { background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base)); }
 
 .recordHeaderLayer { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;}
 .recordHeaderLayer h3 { font-size: 1.5rem; margin: 0; color: var(--text-heading);}
-.statPill { background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.5rem 1.5rem; border-radius: 100px; font-weight: 800; font-size: 0.9rem; letter-spacing: 1px; }
+.statPill { background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.5rem 1.5rem; border-radius: 100px; font-weight: 600; font-size: 0.9rem; letter-spacing: 1px; }
 
 /* Tables */
-.tableWrapper { border-radius: 16px; overflow: hidden; border: 1px solid rgba(15,23,42,0.1); }
+.tableWrapper { border-radius: var(--border-radius-sm); overflow: hidden; border: 1px solid var(--border-color); }
 .neonTable { width: 100%; border-collapse: collapse; }
-.neonTable th { padding: 1.5rem; text-align: left; background: rgba(255,255,255,0.5); color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; border-bottom: 1px solid rgba(15,23,42,0.1);}
-.neonTable td { padding: 1.5rem; border-bottom: 1px solid rgba(15,23,42,0.05); font-size: 1.1rem; color: var(--text-body);}
-.neonTable tr:hover td { background: rgba(255,255,255,0.3); }
+.neonTable th { padding: 1.5rem; text-align: left; background: var(--bg-subtle); color: var(--text-muted); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; border-bottom: 1px solid var(--border-color);}
+.neonTable td { padding: 1.5rem; border-bottom: 1px solid var(--border-color); font-size: 1rem; color: var(--text-body);}
+.neonTable tr:hover td { background: var(--bg-app); }
+[data-theme='glass'] .neonTable th { background: rgba(255,255,255,0.5); }
+[data-theme='glass'] .neonTable td { background: rgba(255,255,255,0.2); }
 
 .emptyMsg { text-align: center; color: var(--text-muted); padding: 3rem; font-style: italic;}

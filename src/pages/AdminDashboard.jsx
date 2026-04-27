@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Layout, Menu, Typography, Card, Button, Input, Table,
   Badge, Tag, Statistic, Avatar, Space, Row, Col, Modal, ConfigProvider,
-  Popconfirm, Dropdown, Segmented, Select, Form, Checkbox, Divider
+  Popconfirm, Dropdown, Segmented, Select, Form, Checkbox, Divider, message, Skeleton
 } from "antd";
 import {
   AppstoreOutlined, ProjectOutlined, TeamOutlined,
@@ -13,29 +13,34 @@ import {
   PlusOutlined, DeleteOutlined, CheckCircleOutlined,
   CloseCircleOutlined, FilePdfOutlined, ArrowRightOutlined,
   ThunderboltOutlined, BuildOutlined, FilterOutlined, WarningOutlined,
-  CreditCardOutlined, BankOutlined, WalletOutlined
+  CreditCardOutlined, BankOutlined, WalletOutlined, BellOutlined,
+  SettingOutlined, SearchOutlined
 } from "@ant-design/icons";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer
 } from 'recharts';
 import styles from "./AdminDashboard.module.css";
-import heroAdmin from "../assets/hero_admin.png";
+import { useAuth } from "../context/AuthContext";
 
 const { Header, Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [apps, setApps] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [hours, setHours] = useState([]);
-  const [user, setUser] = useState(null);
   
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [reqSkills, setReqSkills] = useState("");
   const [tab, setTab] = useState("overview");
   const [appFilter, setAppFilter] = useState("ALL");
+  
+  // UX Enhancements
+  const [loadingFeed, setLoadingFeed] = useState(true);
+  const [actionLocks, setActionLocks] = useState({}); // Tracking loading states for buttons
   
   // Payment Gateway Modal State
   const [paymentModalVisible, setPaymentModalVisible] = useState(false);
@@ -48,47 +53,80 @@ export default function AdminDashboard() {
   const [selectedCard, setSelectedCard] = useState('new');
 
   useEffect(() => { 
-    const stored = localStorage.getItem("user");
-    if (stored) setUser(JSON.parse(stored));
     load();
   }, []);
 
   const load = async () => {
+    setLoadingFeed(true);
     try {
       const [a, j, h] = await Promise.all([getApplications(), getJobs(), getAllHours()]);
       setApps(a || []); setJobs(j || []); setHours(h || []);
-    } catch {}
+    } catch {
+      message.error("Failed to sync system matrices. Gateway may be unreachable.");
+    } finally {
+      setLoadingFeed(false);
+    }
   };
 
-  const handleLogout = () => { localStorage.removeItem("user"); navigate("/login"); };
+  const handleLogout = () => { logout(); navigate("/login"); };
+
+  const lockAction = (id, bool) => setActionLocks(prev => ({ ...prev, [id]: bool }));
 
   const createJob = async () => {
     if (!title || !desc) {
-      Modal.warning({ title: 'Validation Error', content: 'Please fill all fields.' });
+      message.warning('Validation Error: Please fill all assignment fields.');
       return;
     }
-    await addJob({ title, description: desc, requiredSkills: reqSkills });
-    setTitle(""); setDesc(""); setReqSkills(""); load();
-    setTab("jobs");
+    lockAction('create_job', true);
+    try {
+      await addJob({ title, description: desc, requiredSkills: reqSkills });
+      message.success("Assignment successfully deployed.");
+      setTitle(""); setDesc(""); setReqSkills(""); load();
+      setTab("jobs");
+    } catch (e) {
+      message.error("Failed to deploy assignment.");
+    } finally {
+      lockAction('create_job', false);
+    }
   };
 
   const removeJob = async (id) => {
-    await deleteJob(id); load();
+    lockAction(`delete_${id}`, true);
+    try {
+      await deleteJob(id); 
+      message.success("Assignment forcefully revoked.");
+      load();
+    } catch(e) {
+      message.error("Revocation failed.");
+    } finally {
+      lockAction(`delete_${id}`, false);
+    }
+  };
+
+  const handleApproveApp = async (id, status) => {
+    lockAction(`app_${id}`, true);
+    try {
+      await approveApp(id, status);
+      message.success(`Application structurally ${status.toLowerCase()}.`);
+      load();
+    } catch (e) {
+      message.error("Review transmission failed.");
+    } finally {
+      lockAction(`app_${id}`, false);
+    }
   };
 
   const handleApproveHours = async (id) => {
+    lockAction(`hours_${id}`, true);
     try {
       await approveHours(id);
+      message.success("Operation hours verified & approved.");
       load();
-    } catch (e) { Modal.error({ content: "Failed to approve" }); }
-  };
-
-  const handlePayHours = async (id) => {
-    try {
-      await payHours(id);
-      Modal.success({ content: "Payment Processed Successfully" });
-      load();
-    } catch (e) { Modal.error({ content: "Failed to process payment" }); }
+    } catch (e) { 
+      message.error("Approval rejected by server"); 
+    } finally {
+      lockAction(`hours_${id}`, false);
+    }
   };
 
   const processMockPayment = async () => {
@@ -96,21 +134,24 @@ export default function AdminDashboard() {
       if (selectedCard === 'new') {
          await paymentForm.validateFields();
       }
+      lockAction('pay_modal', true);
       await payHours(paymentHoursId);
-      Modal.success({ content: `Payment Processed Successfully` });
+      message.success(`Payment Processed Successfully`);
       setPaymentModalVisible(false);
       paymentForm.resetFields();
       load();
     } catch (e) {
       if(e.errorFields) return;
-      Modal.error({ content: "Failed to process payment" });
+      message.error("Failed to process payment");
+    } finally {
+      lockAction('pay_modal', false);
     }
   };
 
   const totalHours = hours.reduce((s, h) => s + (h.hours || 0), 0);
   const pendingApps = apps.filter(a => a.status === "PENDING");
   
-  // Feature: Calculate Top Performers
+  // Calculate Top Performers
   const studentMap = {};
   hours.forEach(h => {
      if (h.student && h.student.name) {
@@ -196,13 +237,24 @@ export default function AdminDashboard() {
               className={styles.menu}
             />
 
-            <Space className={styles.profileTools} size="large">
+            <Space className={styles.profileTools} size="large" align="center">
+              <div style={{display: 'flex', alignItems: 'center', background: 'var(--bg-app)', padding: '4px 12px', borderRadius: 'var(--border-radius-full)', border: '1px solid var(--border-color)'}}>
+                 <SearchOutlined style={{color: 'var(--text-muted)'}} />
+                 <input placeholder="Search records..." style={{border: 'none', background: 'transparent', outline: 'none', marginLeft: '8px', fontSize: 'var(--text-sm)', width: '150px'}} />
+              </div>
+              
+              <Badge count={pendingApps.length} size="small" offset={[-2, 6]}>
+                 <Button type="text" icon={<BellOutlined style={{fontSize: 'var(--text-lg)', color: 'var(--text-heading)'}} />} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}} />
+              </Badge>
+              
+              <Button type="text" icon={<SettingOutlined style={{fontSize: 'var(--text-lg)', color: 'var(--text-heading)'}} />} style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}} />
+
               <Dropdown menu={{ items: profileMenuItems, onClick: onProfileMenuClick }} trigger={['click']}>
-                 <Space style={{cursor: 'pointer'}}>
+                 <Space style={{cursor: 'pointer', marginLeft: 'var(--space-2)'}}>
                    <Avatar style={{ backgroundColor: '#1d4ed8' }} icon={<UserOutlined />} />
                    <div style={{display: 'flex', flexDirection: 'column', lineHeight: 1.2}}>
-                     <span className={styles.headerGreeting}>Admin</span>
-                     <span style={{fontSize: '12px', color: 'var(--text-muted)'}}>Workspace</span>
+                     <span className={styles.headerGreeting}>{user?.name?.split(" ")[0] || "Admin"}</span>
+                     <span style={{fontSize: 'var(--text-xs)', color: 'var(--text-muted)'}}>Workspace</span>
                    </div>
                  </Space>
               </Dropdown>
@@ -220,15 +272,14 @@ export default function AdminDashboard() {
                        <Input placeholder="Assignment Title" value={title} onChange={e => setTitle(e.target.value)} />
                        <Input.TextArea placeholder="Assignment Details..." value={desc} onChange={e => setDesc(e.target.value)} rows={3} style={{resize: 'none'}} />
                        <Input placeholder="Required Skills (e.g. Java, React, SQL)" value={reqSkills} onChange={e => setReqSkills(e.target.value)} />
-                       <Button type="primary" block icon={<PlusOutlined />} onClick={createJob}>
+                       <Button type="primary" block icon={<PlusOutlined />} loading={actionLocks['create_job']} onClick={createJob}>
                          Deploy Task
                        </Button>
                     </Space>
                  </Card>
 
                  <Card title="Top Performers" bordered={false} style={{marginTop: '24px'}} className={styles.metricCard}>
-                    {topPerformers.length === 0 && <Text type="secondary" style={{fontSize: '12px'}}>No hours logged yet.</Text>}
-                    {topPerformers.map((p, idx) => (
+                    {loadingFeed ? <Skeleton active paragraph={{rows: 4}} title={false} /> : topPerformers.length === 0 ? <Text type="secondary" style={{fontSize: '12px'}}>No hours logged yet.</Text> : topPerformers.map((p, idx) => (
                        <div key={idx} style={{display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #f3f4f6'}}>
                            <Space>
                               <Avatar size="small" style={{backgroundColor: idx === 0 ? '#fbbf24' : '#1d4ed8'}}>{idx + 1}</Avatar>
@@ -248,17 +299,23 @@ export default function AdminDashboard() {
                       <Row gutter={[16, 16]}>
                         <Col xs={24} md={8}>
                           <Card bordered={false} className={styles.metricCard}>
-                            <Statistic title="Active Assignments" value={jobs.length} prefix={<ProjectOutlined style={{color: '#1d4ed8'}} />} />
+                            <Skeleton loading={loadingFeed} active paragraph={{rows: 1}} title={false}>
+                               <Statistic title="Active Assignments" value={jobs.length} prefix={<ProjectOutlined style={{color: '#1d4ed8'}} />} />
+                            </Skeleton>
                           </Card>
                         </Col>
                         <Col xs={24} md={8}>
                           <Card bordered={false} className={styles.metricCard}>
-                            <Statistic title="Awaiting Review" value={pendingApps.length} prefix={<TeamOutlined style={{color: '#f59e0b'}} />} />
+                            <Skeleton loading={loadingFeed} active paragraph={{rows: 1}} title={false}>
+                               <Statistic title="Awaiting Review" value={pendingApps.length} prefix={<TeamOutlined style={{color: '#f59e0b'}} />} />
+                            </Skeleton>
                           </Card>
                         </Col>
                         <Col xs={24} md={8}>
                           <Card bordered={false} className={styles.metricCard}>
-                            <Statistic title="Total Hours Logged" value={totalHours} prefix={<ClockCircleOutlined style={{color: '#10b981'}} />} suffix="h" />
+                            <Skeleton loading={loadingFeed} active paragraph={{rows: 1}} title={false}>
+                              <Statistic title="Total Hours Logged" value={totalHours} prefix={<ClockCircleOutlined style={{color: '#10b981'}} />} suffix="h" />
+                            </Skeleton>
                           </Card>
                         </Col>
                       </Row>
@@ -266,7 +323,7 @@ export default function AdminDashboard() {
                       <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
                         <Col xs={24} lg={14}>
                           <Card bordered={false} title="System Activity Feed" className={styles.itemCard} style={{height: '100%'}}>
-                             {apps.slice(0, 5).map((a, idx) => (
+                             {loadingFeed ? <Skeleton active paragraph={{rows: 8}} /> : apps.length === 0 ? <Text type="secondary">System feed idle.</Text> : apps.slice(0, 5).map((a, idx) => (
                                 <div key={idx} style={{display: 'flex', margin: '12px 0', paddingBottom: '12px', borderBottom: '1px solid #f3f4f6'}}>
                                    <Avatar size="large" style={{ backgroundColor: '#eff6ff', color: '#1d4ed8', marginRight: '16px' }}>{a.student?.name?.charAt(0) || "U"}</Avatar>
                                    <div>
@@ -277,22 +334,23 @@ export default function AdminDashboard() {
                                    </div>
                                 </div>
                              ))}
-                             {apps.length === 0 && <Text type="secondary">System feed idle.</Text>}
                           </Card>
                         </Col>
                         <Col xs={24} lg={10}>
                           <Card bordered={false} className={styles.chartCard} style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                             <Title level={5} style={{ marginBottom: '20px' }}>System Metrics</Title>
                             <div style={{ flex: 1, minHeight: '220px' }}>
-                              <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={chartData} margin={{top: 10, right: 10, left: -20, bottom: 0}}>
-                                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} />
-                                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} />
-                                  <RechartsTooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }} />
-                                  <Bar dataKey="value" fill="#1d4ed8" radius={[4, 4, 0, 0]} barSize={25} />
-                                </BarChart>
-                              </ResponsiveContainer>
+                              {!loadingFeed && (
+                                <ResponsiveContainer width="100%" height="100%">
+                                  <BarChart data={chartData} margin={{top: 10, right: 10, left: -20, bottom: 0}}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} />
+                                    <RechartsTooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }} />
+                                    <Bar dataKey="value" fill="#1d4ed8" radius={[4, 4, 0, 0]} barSize={25} />
+                                  </BarChart>
+                                </ResponsiveContainer>
+                              )}
                             </div>
                           </Card>
                         </Col>
@@ -306,7 +364,12 @@ export default function AdminDashboard() {
                       <Paragraph type="secondary" style={{ marginBottom: '24px' }}>Active assignments available into the gateway.</Paragraph>
 
                       <Row gutter={[16, 16]}>
-                        {jobs.map(j => (
+                        {loadingFeed ? (
+                           <>
+                             <Col xs={24} md={12}><Card className={styles.itemCard}><Skeleton active paragraph={{rows: 3}} /></Card></Col>
+                             <Col xs={24} md={12}><Card className={styles.itemCard}><Skeleton active paragraph={{rows: 3}} /></Card></Col>
+                           </>
+                        ) : jobs.map(j => (
                           <Col xs={24} md={12} key={j.id}>
                             <motion.div whileHover={{ y: -2 }}>
                               <Card 
@@ -314,7 +377,7 @@ export default function AdminDashboard() {
                                 className={styles.itemCard}
                                 actions={[
                                   <Popconfirm title="Delete this assignment?" onConfirm={() => removeJob(j.id)}>
-                                    <Button type="text" danger icon={<DeleteOutlined />}>Revoke</Button>
+                                    <Button type="text" danger icon={<DeleteOutlined />} loading={actionLocks[`delete_${j.id}`]}>Revoke</Button>
                                   </Popconfirm>
                                 ]}
                               >
@@ -343,7 +406,13 @@ export default function AdminDashboard() {
                       </div>
 
                       <Row gutter={[16, 16]}>
-                        {filteredApps.map(a => (
+                        {loadingFeed ? (
+                           <>
+                             <Col xs={24} md={12}><Card className={styles.itemCard}><Skeleton active avatar paragraph={{rows: 3}} /></Card></Col>
+                             <Col xs={24} md={12}><Card className={styles.itemCard}><Skeleton active avatar paragraph={{rows: 3}} /></Card></Col>
+                           </>
+                        ) : filteredApps.length === 0 ? <div style={{width: '100%', textAlign: 'center', padding: '40px'}}><Text type="secondary">No applications found in this queue.</Text></div> 
+                        : filteredApps.map(a => (
                           <Col xs={24} md={12} key={a.id}>
                              <motion.div whileHover={{ y: -2 }}>
                               <Card bordered={false} className={styles.itemCard}>
@@ -379,10 +448,10 @@ export default function AdminDashboard() {
                                   </Button>
                                   {a.status === "PENDING" && (
                                     <Space style={{ marginTop: '16px', display: 'flex', width: '100%', justifyContent: 'space-between' }} size="small">
-                                      <Button type="primary" style={{ background: '#10b981', borderColor: '#10b981', flex: 1, borderRadius: '4px' }} icon={<CheckCircleOutlined />} onClick={() => { approveApp(a.id, "APPROVED"); load(); }}>
+                                      <Button type="primary" style={{ background: '#10b981', borderColor: '#10b981', flex: 1, borderRadius: '4px' }} icon={<CheckCircleOutlined />} loading={actionLocks[`app_${a.id}`]} onClick={() => { handleApproveApp(a.id, "APPROVED"); }}>
                                         Approve
                                       </Button>
-                                      <Button danger type="primary" icon={<CloseCircleOutlined />} style={{ flex: 1, borderRadius: '4px' }} onClick={() => { approveApp(a.id, "REJECTED"); load(); }}>
+                                      <Button danger type="primary" icon={<CloseCircleOutlined />} style={{ flex: 1, borderRadius: '4px' }} loading={actionLocks[`app_${a.id}`]} onClick={() => { handleApproveApp(a.id, "REJECTED"); }}>
                                         Decline
                                       </Button>
                                     </Space>
@@ -392,7 +461,6 @@ export default function AdminDashboard() {
                             </motion.div>
                           </Col>
                         ))}
-                        {filteredApps.length === 0 && <div style={{width: '100%', textAlign: 'center', padding: '40px'}}><Text type="secondary">No applications found in this queue.</Text></div>}
                       </Row>
                     </motion.div>
                   )}
@@ -406,6 +474,7 @@ export default function AdminDashboard() {
                          <Table 
                            dataSource={hours} 
                            rowKey="id" 
+                           loading={loadingFeed}
                            pagination={{ pageSize: 12 }}
                            columns={[
                              { title: 'Student Identity', dataIndex: ['student', 'name'], key: 'student', render: text => <Text strong>{text || 'Unknown'}</Text> },
@@ -422,7 +491,7 @@ export default function AdminDashboard() {
                              }},
                              { title: 'Action', key: 'action', render: (_, record) => {
                                  if (record.status === 'PENDING' || !record.status) {
-                                   return <Button size="small" type="primary" style={{ background: '#10b981', borderColor: '#10b981' }} onClick={() => handleApproveHours(record.id)}>Approve</Button>;
+                                   return <Button size="small" type="primary" loading={actionLocks[`hours_${record.id}`]} style={{ background: '#10b981', borderColor: '#10b981' }} onClick={() => handleApproveHours(record.id)}>Approve</Button>;
                                  } else if (record.status === 'APPROVED') {
                                    return <Button size="small" type="primary" style={{ background: '#1d4ed8' }} onClick={() => { setPaymentHoursId(record.id); setPaymentAmount(record.hours * (record.job?.hourlyRate || 15)); setPaymentModalVisible(true); }}>Pay Student</Button>;
                                  }
@@ -556,7 +625,7 @@ export default function AdminDashboard() {
                 <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginBottom: '4px' }}>Total</Text>
                 <div style={{ color: '#60a5fa', fontSize: '28px', fontWeight: 600 }}>{paymentAmount.toFixed(1)}$</div>
              </div>
-             <Button type="primary" onClick={processMockPayment} style={{ background: '#3b82f6', borderColor: '#3b82f6', height: '48px', padding: '0 48px', fontSize: '16px', fontWeight: 500, borderRadius: '6px' }}>
+             <Button type="primary" loading={actionLocks['pay_modal']} onClick={processMockPayment} style={{ background: '#3b82f6', borderColor: '#3b82f6', height: '48px', padding: '0 48px', fontSize: '16px', fontWeight: 500, borderRadius: '6px' }}>
                 Pay Now
              </Button>
           </div>

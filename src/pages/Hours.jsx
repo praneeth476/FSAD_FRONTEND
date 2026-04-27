@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Layout, Menu, Typography, Card, Button, Space, Row, Col,
-  Statistic, Avatar, Tag, ConfigProvider, Dropdown, Table, InputNumber, Select
+  Statistic, Avatar, Tag, ConfigProvider, Dropdown, Table, InputNumber, Select, message
 } from "antd";
+import { useAuth } from "../context/AuthContext";
 import {
   HomeOutlined, HistoryOutlined, UserOutlined,
   LogoutOutlined, SearchOutlined, HeartOutlined,
@@ -19,7 +20,7 @@ const { Option } = Select;
 
 export default function Hours() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const { user, logout } = useAuth();
 
   const [apps, setApps] = useState([]);
   const [records, setRecords] = useState([]);
@@ -42,21 +43,21 @@ export default function Hours() {
   };
 
   const handleAdd = async () => {
-    if (!hours || !jobId) return alert("Select an approved deployment and specify hours.");
+    if (!hours || !jobId) return message.warning("Select an approved deployment and specify hours.");
     setLoading(true);
     try {
       await addHours(user.id, jobId, hours);
       setHours(null); setJobId(null); 
-      alert("Time block successfully processed."); 
+      message.success("Time block successfully processed."); 
       load();
-    } catch { alert("Failed to log time block."); } 
+    } catch { message.error("Failed to log time block."); } 
     finally { setLoading(false); }
   };
 
   const totalLogged = records.reduce((s, r) => s + parseFloat(r.hours || 0), 0);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    logout();
     navigate("/login");
   };
 

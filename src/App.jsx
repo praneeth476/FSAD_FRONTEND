@@ -8,10 +8,11 @@ import Hours from "./pages/Hours";
 import Admin from "./pages/AdminDashboard";
 import StudentDashboard from "./pages/StudentDashboard";
 import Landing from "./pages/Landing";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 /* ================= PROTECTED ROUTE ================= */
 function Protected({ children, role }) {
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const { user } = useAuth(); // Hook into Context instead of localStorage
 
   if (!user) return <Navigate to="/login" replace />;
 
@@ -58,6 +59,14 @@ export default function App() {
     msalInstance.initialize().then(() => {
       setMsalReady(true);
     }).catch(e => console.error("MSAL Init Error", e));
+
+    // Listen for auth expiration events dispatched by api.js interceptor
+    const handleAuthExpired = () => {
+       alert("Your session has expired. Please log in again.");
+       window.location.href = "/login";
+    };
+    window.addEventListener("auth-expired", handleAuthExpired);
+    return () => window.removeEventListener("auth-expired", handleAuthExpired);
   }, []);
 
   if (isPopupCallback) {
@@ -71,59 +80,61 @@ export default function App() {
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <MsalProvider instance={msalInstance}>
-        <BrowserRouter>
-            <ThemeToggle />
-            <Routes>
-              {/* Landing */}
-              <Route path="/" element={<Landing />} />
+        <AuthProvider>
+          <BrowserRouter>
+              <ThemeToggle />
+              <Routes>
+                {/* Landing */}
+                <Route path="/" element={<Landing />} />
 
-              {/* Auth */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
+                {/* Auth */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
 
-              {/* STUDENT - No 'Layout' wrapper, the dashboard handles its own UI */}
-              <Route
-                path="/student"
-                element={
-                  <Protected role="student">
-                    <StudentDashboard />
-                  </Protected>
-                }
-              />
+                {/* STUDENT */}
+                <Route
+                  path="/student"
+                  element={
+                    <Protected role="student">
+                      <StudentDashboard />
+                    </Protected>
+                  }
+                />
 
-              <Route
-                path="/jobs"
-                element={
-                  <Protected role="student">
-                    <Jobs />
-                  </Protected>
-                }
-              />
+                <Route
+                  path="/jobs"
+                  element={
+                    <Protected role="student">
+                      <Jobs />
+                    </Protected>
+                  }
+                />
 
-              <Route
-                path="/hours"
-                element={
-                  <Protected role="student">
-                    <Hours />
-                  </Protected>
-                }
-              />
+                <Route
+                  path="/hours"
+                  element={
+                    <Protected role="student">
+                      <Hours />
+                    </Protected>
+                  }
+                />
 
-              {/* ADMIN */}
-              <Route
-                path="/admin"
-                element={
-                  <Protected role="admin">
-                    <Admin />
-                  </Protected>
-                }
-              />
+                {/* ADMIN */}
+                <Route
+                  path="/admin"
+                  element={
+                    <Protected role="admin">
+                      <Admin />
+                    </Protected>
+                  }
+                />
 
-              {/* Fallback */}
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </Routes>
-          </BrowserRouter>
+                {/* Fallback */}
+                <Route path="*" element={<Navigate to="/login" replace />} />
+              </Routes>
+            </BrowserRouter>
+          </AuthProvider>
       </MsalProvider>
     </GoogleOAuthProvider>
   );

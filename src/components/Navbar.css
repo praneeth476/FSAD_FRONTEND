@@ -1,129 +1,161 @@
 /* ==========================================================================
-   NAVIGATION BAR (Global Design System)
+   NAVIGATION BAR (SaaS Design System)
    ========================================================================== */
 
-   .premium-navbar {
-    position: fixed;
-    top: var(--space-4);
-    left: 50%;
-    transform: translateX(-50%);
-    width: 95%;
-    max-width: 1200px;
-    height: var(--space-16);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    transition: width var(--transition-bounce), top var(--transition-base), transform var(--transition-base);
-    will-change: width, transform;
-  }
-  
-  /* Scroll-Revealed Shrink Effect */
-  .premium-navbar.scrolled {
-    width: 90%;
-    top: var(--space-2);
-  }
-  .premium-navbar.scrolled .nav-container {
-    box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.8);
-  }
-  
-  /* Inherits .glass-panel from index.css, just applying layout specifics */
-  .nav-container {
-    width: 100%;
-    height: 100%;
-    justify-content: space-between;
-    padding: 0 var(--space-4) 0 var(--space-6);
-    display: flex;
-    align-items: center;
-  }
-  
-  /* Branding */
-  .nav-brand-orb {
-    text-decoration: none;
-    transition: transform var(--transition-base);
-    will-change: transform;
-  }
-  .nav-brand-orb:hover {
-    transform: scale(1.05);
-  }
-  
-  .gradient-orb {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base));
-    box-shadow: 0 0 15px var(--color-primary-glow);
-  }
-  
-  /* Pills Container */
-  .nav-pills {
-    background: rgba(15, 23, 42, 0.03); /* Extremely soft contrast for light theme */
-    padding: var(--space-1);
-    border-radius: var(--space-24);
-  }
-  
-  .nav-pill {
-    position: relative;
-    padding: var(--space-2) var(--space-6);
-    border-radius: var(--space-24);
-    text-decoration: none;
-    font-size: var(--text-sm);
-    font-weight: 700;
-    color: var(--text-muted);
-    transition: color var(--transition-fast);
-    z-index: 1;
-    will-change: color;
-  }
-  
-  .nav-pill:hover {
-    color: var(--color-primary-base);
-  }
-  
-  .nav-pill.active {
-    color: var(--text-heading);
-  }
-  
-  .pill-text {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-  }
-  
-  .active-pill-bg {
-    position: absolute;
-    inset: 0;
-    background: var(--bg-surface);
-    border-radius: var(--space-24);
-    box-shadow: var(--shadow-sm);
-    z-index: -1;
-  }
-  
-  /* User Controls Base Components */
-  .nav-user-badge {
-    background: rgba(15, 23, 42, 0.03);
-    padding: var(--space-1) var(--space-4) var(--space-1) var(--space-1);
-    border-radius: var(--space-24);
-  }
-  
-  .avatar-mini {
-    width: var(--space-8);
-    height: var(--space-8);
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-accent-base), var(--color-secondary-base));
-    color: var(--text-inverse);
-  }
-  
-  .nav-icon-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    padding: 0;
-  }
-  .nav-icon-btn:hover { color: var(--color-error); border-color: rgba(239, 68, 68, 0.3); }
-  
-  @media (max-width: 900px) {
-    .name-clip { display: none; }
-    .nav-pills { display: none; }
-    .nav-brand-orb { margin-right: auto; }
-  }
+.premium-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 72px; /* var(--space-16) usually */
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition-base), border-color var(--transition-base), top var(--transition-base);
+  will-change: transform;
+}
+
+[data-theme='glass'] .premium-navbar {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.premium-navbar.scrolled {
+  /* You can add a smaller height here if desired */
+  box-shadow: var(--shadow-md);
+}
+
+.nav-container {
+  width: 100%;
+  max-width: 1400px;
+  height: 100%;
+  padding: 0 var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Branding */
+.nav-brand-orb {
+  text-decoration: none;
+  transition: transform var(--transition-base);
+  display: flex;
+  align-items: center;
+}
+
+.nav-brand-orb:hover {
+  transform: translateY(-1px);
+}
+
+.gradient-orb {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--border-radius-md);
+  background: linear-gradient(135deg, var(--color-primary-base), var(--color-accent-base));
+  box-shadow: var(--shadow-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+/* Pills Container -> Standard SaaS Nav Links */
+.nav-pills {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.nav-pill {
+  position: relative;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--border-radius-sm);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.nav-pill:hover {
+  color: var(--text-heading);
+  background-color: var(--bg-app);
+}
+
+.nav-pill.active {
+  color: var(--color-primary-base);
+  background-color: var(--color-primary-glow);
+}
+
+.pill-text {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* User Controls Base Components */
+.nav-user-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-3);
+  border-radius: var(--border-radius-full);
+  border: 1px solid transparent;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.nav-user-badge:hover {
+  background-color: var(--bg-app);
+  border-color: var(--border-color);
+}
+
+.avatar-mini {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent-base), var(--color-primary-base));
+  color: var(--text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.name-clip {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.nav-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.nav-icon-btn:hover { 
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444; 
+  border-color: rgba(239, 68, 68, 0.3); 
+}
+
+@media (max-width: 900px) {
+  .name-clip { display: none; }
+  .nav-pills { display: none; }
+}
