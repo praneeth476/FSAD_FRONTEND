@@ -59,6 +59,9 @@ export const oauthLoginStudent = async (data) => {
     const res = await api.post("/students/oauth-login", data);
     return res.data;
   } catch (err) {
+    if (err.response?.status === 403) {
+      throw new Error("This account is registered with a different role (e.g. Administrator). Please switch roles and try again.");
+    }
     throw new Error(err.response?.data?.message || "OAuth login failed");
   }
 };

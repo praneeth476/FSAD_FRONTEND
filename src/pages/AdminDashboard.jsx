@@ -443,7 +443,7 @@ export default function AdminDashboard() {
                                 )}
 
                                 <div className={styles.appTools}>
-                                  <Button type="link" icon={<FilePdfOutlined />} href={`http://localhost:8080/api/applications/resume/${a.id}`} target="_blank" style={{ padding: 0, color: '#1d4ed8', fontWeight: 500 }}>
+                                  <Button type="link" icon={<FilePdfOutlined />} href={`/api/applications/resume/${a.id}`} target="_blank" style={{ padding: 0, color: '#1d4ed8', fontWeight: 500 }}>
                                     Review Resume
                                   </Button>
                                   {a.status === "PENDING" && (
